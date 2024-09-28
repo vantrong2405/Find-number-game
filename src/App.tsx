@@ -15,9 +15,7 @@ function App() {
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
   const [nextIdClick, setNextIdClick] = useState<number>(0);
-  const [statusGame, setStatusGame] = useState<
-    "failed" | "success" | "pending"
-  >("pending");
+  const [statusGame, setStatusGame] = useState<"failed" | "success" | "pending">("pending");
 
   const formatTime = (time: number): string => {
     const minutes = Math.floor(time / 60);
@@ -27,7 +25,8 @@ function App() {
     if (minutes === 0 && seconds === 0) {
       return `0.${formattedMilliseconds}`;
     }
-    const formattedSeconds = String(seconds).padStart(2, "0");
+
+  const formattedSeconds = String(seconds).padStart(2, "0");
     return minutes > 0
       ? `${minutes}:${formattedSeconds}.${formattedMilliseconds}`
       : `${seconds}.${formattedMilliseconds}`;
@@ -44,7 +43,7 @@ function App() {
   };
 
   const handleClickItems = (quantity: IQuantity) => {
-    if (statusGame !== "pending") {
+    if (statusGame !== "pending") { 
       return;
     }
 
