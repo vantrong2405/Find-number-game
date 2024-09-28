@@ -14,7 +14,7 @@ function App() {
   const [quantityArray, setQuantityArray] = useState<IQuantity[]>([]);
   const [time, setTime] = useState<number>(0);
   const [isRunning, setIsRunning] = useState<boolean>(false);
-  const [nextExpectedId, setNextExpectedId] = useState<number>(0);
+  const [nextIdClick, setNextIdClick] = useState<number>(0);
   const [statusGame, setStatusGame] = useState<
     "failed" | "success" | "pending"
   >("pending");
@@ -32,41 +32,51 @@ function App() {
       ? `${minutes}:${formattedSeconds}.${formattedMilliseconds}`
       : `${seconds}.${formattedMilliseconds}`;
   };
-  
+
   const randomPositionItems = (n: number) => {
-    const numbers = Array.from({ length: n }, (_, i) => i + 1).map(num => {
+    const numbers = Array.from({ length: n }, (_, i) => i).map(num => {
       const x = `${Math.random() * 90}%`;
       const y = `${Math.random() * 90}%`;
       return { id: num, value: num, x, y, status: false };
     });
+
     setQuantityArray(numbers);
   };
 
   const handleClickItems = (quantity: IQuantity) => {
     if (statusGame !== "pending") {
-      return; 
+      return;
     }
-  
-    if (quantity.id === nextExpectedId + 1) { 
+
+    if (quantity.id === nextIdClick) {
       setQuantityArray(prev =>
-        prev.map(item => 
-          item.id === quantity.id ? { ...item, status: true, clicked: true } : item
+        prev.map(
+          item => (item.id === quantity.id ? { ...item, clicked: true } : item)
         )
       );
-      const nextId = nextExpectedId + 1;
+
+      const nextId = nextIdClick + 1;
       if (nextId === quantityArray.length) {
         setStatusGame("success");
       } else {
-        setNextExpectedId(nextId);
+        setNextIdClick(nextId);
       }
+
+      setTimeout(() => {
+        setQuantityArray(prev =>
+          prev.map(
+            item => (item.id === quantity.id ? { ...item, status: true } : item)
+          )
+        );
+      }, 1000);
+
     } else {
       setStatusGame("failed");
     }
   };
-  
 
   const handleRestart = () => {
-    setNextExpectedId(0);
+    setNextIdClick(0);
     setTime(0);
     randomPositionItems(points);
     setStatusGame("pending");
@@ -79,7 +89,7 @@ function App() {
 
   const handleStartGame = (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setNextExpectedId(0);
+    setNextIdClick(0);
     randomPositionItems(points);
     setStatusGame("pending");
     setIsRunning(true);
@@ -87,7 +97,7 @@ function App() {
 
   useEffect(
     () => {
-      let timer: any
+      let timer: any;
       if (isRunning && statusGame === "pending") {
         timer = setInterval(() => {
           setTime(prevTime => prevTime + 0.1);
@@ -130,11 +140,9 @@ function App() {
             />
           </div>
           <div className="flex items-center">
-            <div className="mr-14 w-16">
-              Time: 
-            </div>
+            <div className="mr-14 w-16">Time:</div>
             <p>
-            {formatTime(time)}s
+              {formatTime(time)}s
             </p>
           </div>
           <form onSubmit={handleStartGame}>
@@ -151,21 +159,23 @@ function App() {
             style={{ width: "100%", height: "500px" }}
           >
             {quantityArray.map((quantity, index) =>
-              <Fragment key={index}>
-                {!quantity.status &&
-                 <div
-                 className={`absolute w-10 h-10 flex items-center justify-center rounded-full border-2 border-black cursor-pointer hover:bg-slate-200 hover:transition-colors ${quantity.clicked ? 'clicked' : ''}`}
-                 style={{
-                   left: quantity.x,
-                   top: quantity.y,
-                   zIndex: quantityArray.length - index,
-                   position: "absolute",
-                 }}
-                 onClick={() => handleClickItems(quantity)}
-               >
-                 {quantity.value}
-               </div>
-               }
+              <Fragment key={quantity.id}>
+                {!quantity.status
+                  ? <div
+                      className={`absolute w-10 h-10 flex items-center justify-center rounded-full border-2 border-black cursor-pointer hover:bg-slate-200 hover:transition-colors ${quantity.clicked
+                        ? "clicked"
+                        : ""}`}
+                      style={{
+                        left: quantity.x,
+                        top: quantity.y,
+                        zIndex: quantityArray.length - index,
+                        position: "absolute"
+                      }}
+                      onClick={() => handleClickItems(quantity)}
+                    >
+                      {quantity.value + 1}
+                    </div>
+                  : null}
               </Fragment>
             )}
           </div>

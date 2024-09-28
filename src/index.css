@@ -9,12 +9,25 @@
 }
 
 button {
-    @apply border px-4 py-1;
+    @apply border px-4 ;
   }
 
-.clicked {
-    background-color: red;
-    opacity: 0; 
-    transition: background-color 1s ease-in-out, opacity 1s ease-in-out; 
+  @keyframes fadeAndDisappear {
+    0% {
+      background-color: rgba(255, 0, 0, 0.3); 
+      opacity: 1;
+    }
+    50% {
+      background-color: rgba(255, 0, 0, 0.7);
+      opacity: 1;
+    }
+    100% {
+      background-color: rgba(255, 0, 0, 1);
+      opacity: 0; /* Biến mất */
+    }
   }
   
+  .clicked {
+    animation: fadeAndDisappear 2s ease-in-out forwards; 
+    pointer-events: none;
+  }
